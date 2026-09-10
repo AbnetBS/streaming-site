@@ -96,6 +96,7 @@ export default function StreamTabs({ match }: { match: Match }) {
                   : "border-line bg-surface text-muted hover:text-white hover:border-accent/40"
               }`}
             >
+              <span className="tabular-nums opacity-60 mr-1.5">{i + 1}.</span>
               {l.label}
               {l.quality && (
                 <span className="ml-2 text-[10px] font-bold uppercase opacity-70">{l.quality}</span>

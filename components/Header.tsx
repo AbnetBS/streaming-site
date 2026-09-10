@@ -1,6 +1,14 @@
 import Link from "next/link";
+import { listMatches } from "@/lib/db";
 
-export default function Header() {
+export default async function Header() {
+  let liveCount = 0;
+  try {
+    liveCount = listMatches().filter((m) => m.status === "live").length;
+  } catch {
+    liveCount = 0;
+  }
+
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-[#070b14]/85 backdrop-blur">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
@@ -21,6 +29,15 @@ export default function Header() {
           >
             Matches
           </Link>
+          {liveCount > 0 && (
+            <Link
+              href="/"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-live hover:bg-live/10 transition-colors font-semibold"
+            >
+              <span className="live-dot w-1.5 h-1.5 rounded-full bg-live" />
+              {liveCount} live
+            </Link>
+          )}
           <Link
             href="/admin"
             className="px-3 py-1.5 rounded-md text-muted hover:text-white hover:bg-surface-2 transition-colors"
