@@ -2,6 +2,7 @@ import "server-only";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
+import { toYouTubeEmbedUrl } from "./embed";
 import type { DBData, Match, MatchInput, StreamLink, StreamLinkInput } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");

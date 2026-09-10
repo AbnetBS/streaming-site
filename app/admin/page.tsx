@@ -209,6 +209,65 @@ function LinkManager({ match, onChanged }: { match: Match; onChanged: () => void
   );
 }
 
+/* ---------------------------------- fixture importer ---------------------------------- */
+
+function ImportFixtures({ onImported }: { onImported: () => void }) {
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [provider, setProvider] = useState<"thesportsdb" | "football-data">("thesportsdb");
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<string>("");
+  const [error, setError] = useState("");
+
+  async function runImport(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setResult("");
+    setError("");
+    const r = await api<{ imported: number; skipped: number; providerTotal: number }>(
+      "/api/admin/import",
+      { method: "POST", body: JSON.stringify({ date, provider }) }
+    );
+    setBusy(false);
+    if (r.ok && r.data) {
+      setResult(
+        `Imported ${r.data.imported} new match${r.data.imported === 1 ? "" : "es"} for ${date} (${r.data.skipped} duplicates skipped, ${r.data.providerTotal} found).`
+      );
+      onImported();
+    } else setError(r.error || "Import failed");
+  }
+
+  return (
+    <form onSubmit={runImport} className="rounded-2xl border border-line bg-surface p-5 space-y-3">
+      <h2 className="font-bold">Import real fixtures</h2>
+      <p className="text-xs text-muted leading-relaxed">
+        Pulls the day&apos;s football schedule from a legal sports-data provider and creates match
+        entries automatically (duplicates skipped). Then just add stream links to the matches you
+        want. Sources: TheSportsDB works out of the box; football-data.org needs a free key (
+        <code className="text-accent">FOOTBALL_DATA_KEY</code>). Statuses (live/finished) update on
+        re-import.
+      </p>
+      <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] items-end">
+        <div>
+          <label className={labelCls}>Date</label>
+          <input type="date" className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} required />
+        </div>
+        <div>
+          <label className={labelCls}>Provider</label>
+          <select className={inputCls} value={provider} onChange={(e) => setProvider(e.target.value as "thesportsdb" | "football-data")}>
+            <option value="thesportsdb">TheSportsDB (free)</option>
+            <option value="football-data">football-data.org (needs key)</option>
+          </select>
+        </div>
+        <button className={btnPrimary} disabled={busy}>
+          {busy ? "Importing…" : "Import fixtures"}
+        </button>
+      </div>
+      {result && <p className="text-sm text-accent">{result}</p>}
+      {error && <p className="text-sm text-live">{error}</p>}
+    </form>
+  );
+}
+
 /* ---------------------------------- dashboard ---------------------------------- */
 
 function Dashboard({ onLogout }: { onLogout: () => void }) {
@@ -276,9 +335,12 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
         </button>
       </div>
 
+      {/* Import real fixtures */}
+      <ImportFixtures onImported={refresh} />
+
       {/* Create match */}
       <form onSubmit={createMatch} className="rounded-2xl border border-line bg-surface p-5 space-y-4">
-        <h2 className="font-bold">Add a match</h2>
+        <h2 className="font-bold">Add a match manually</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <label className={labelCls}>Competition</label>

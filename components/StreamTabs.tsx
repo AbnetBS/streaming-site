@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Match, StreamLink } from "@/lib/types";
+import { toIframeSrc } from "@/lib/embed";
 
 function reportClick(linkId: string) {
   // Fire-and-forget click counter (used to see which links are popular in admin)
@@ -109,7 +110,7 @@ export default function StreamTabs({ match }: { match: Match }) {
       {current.embeddable ? (
         <div className="relative rounded-xl overflow-hidden border border-line bg-black aspect-video">
           <iframe
-            src={current.url}
+            src={toIframeSrc(current.url)}
             className="absolute inset-0 w-full h-full"
             allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
             allowFullScreen
