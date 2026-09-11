@@ -11,6 +11,12 @@ export interface StreamLink {
   createdAt: string;
 }
 
+export interface BroadcastInfo {
+  label: string; // e.g. "Watch officially on DAZN"
+  url: string; // official or affiliate URL
+  note?: string; // e.g. "Free with account" / "Subscription required"
+}
+
 export interface Match {
   id: string;
   competition: string;
@@ -19,6 +25,7 @@ export interface Match {
   kickoff: string; // ISO 8601 datetime
   status: MatchStatus;
   links: StreamLink[];
+  broadcast?: BroadcastInfo | null; // "where to watch officially" / affiliate slot
   createdAt: string;
 }
 

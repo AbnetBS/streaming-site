@@ -99,6 +99,25 @@ function LinkManager({ match, onChanged }: { match: Match; onChanged: () => void
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  // "Where to watch" (affiliate/official) editor state
+  const [bLabel, setBLabel] = useState(match.broadcast?.label || "");
+  const [bUrl, setBUrl] = useState(match.broadcast?.url || "");
+  const [bNote, setBNote] = useState(match.broadcast?.note || "");
+  const [bMsg, setBMsg] = useState("");
+
+  async function saveBroadcast(e: React.FormEvent) {
+    e.preventDefault();
+    setBMsg("");
+    const r = await api(`/api/admin/matches/${match.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        broadcast: bLabel.trim() && bUrl.trim() ? { label: bLabel, url: bUrl, note: bNote } : null,
+      }),
+    });
+    setBMsg(r.ok ? "Saved ✓" : r.error || "Failed to save");
+    if (r.ok) onChanged();
+  }
+
   async function addLink(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -203,6 +222,44 @@ function LinkManager({ match, onChanged }: { match: Match; onChanged: () => void
           <button className={btnPrimary} disabled={busy}>
             {busy ? "Adding…" : "Add link"}
           </button>
+        </div>
+      </form>
+
+      {/* Where to watch officially — affiliate/official slot */}
+      <form
+        onSubmit={saveBroadcast}
+        className="border-t border-line pt-4 grid gap-2 sm:grid-cols-[1fr_1fr_auto] items-end"
+      >
+        <div className="sm:col-span-2">
+          <label className={labelCls}>Where to watch officially — label (affiliate link slot)</label>
+          <input
+            className={inputCls}
+            value={bLabel}
+            onChange={(e) => setBLabel(e.target.value)}
+            placeholder='e.g. "Watch on DAZN (affiliate)" — leave both empty to remove'
+          />
+        </div>
+        <div>
+          <label className={labelCls}>URL</label>
+          <input
+            className={inputCls}
+            value={bUrl}
+            onChange={(e) => setBUrl(e.target.value)}
+            placeholder="https://…"
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelCls}>Small note (optional)</label>
+          <input
+            className={inputCls}
+            value={bNote}
+            onChange={(e) => setBNote(e.target.value)}
+            placeholder="e.g. Free with account / Subscription"
+          />
+        </div>
+        <div className="flex items-center justify-end gap-2">
+          {bMsg && <span className="text-xs text-accent mr-auto">{bMsg}</span>}
+          <button className={btnGhost}>Save</button>
         </div>
       </form>
     </div>

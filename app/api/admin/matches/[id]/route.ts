@@ -19,6 +19,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     awayTeam?: string;
     kickoff?: string;
     status?: MatchStatus;
+    broadcast?: { label: string; url: string; note?: string } | null;
   };
   try {
     body = await req.json();
@@ -28,6 +29,20 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
   if (body.status && !["scheduled", "live", "finished"].includes(body.status)) {
     return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+  }
+  if (body.broadcast) {
+    const b = body.broadcast;
+    if (!b.label?.trim() || !b.url?.trim() || !/^https?:\/\//i.test(b.url.trim())) {
+      return NextResponse.json(
+        { error: "broadcast needs a label and an http(s) url" },
+        { status: 400 }
+      );
+    }
+    body.broadcast = {
+      label: b.label.trim(),
+      url: b.url.trim(),
+      note: b.note?.trim() || undefined,
+    };
   }
 
   const match = updateMatch(id, body);

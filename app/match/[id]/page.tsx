@@ -117,6 +117,31 @@ export default async function MatchPage({ params }: Props) {
             <StreamTabs match={match} />
           </section>
 
+          {/* Where to watch officially (affiliate/official slot) */}
+          {match.broadcast && (
+            <a
+              href={match.broadcast.url}
+              target="_blank"
+              rel="noopener noreferrer nofollow sponsored"
+              className="block rounded-xl border border-accent/40 bg-gradient-to-r from-accent/15 to-transparent hover:from-accent/25 transition-colors p-4"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-accent">
+                    ✦ Where to watch officially
+                  </p>
+                  <p className="font-semibold mt-1">{match.broadcast.label}</p>
+                  {match.broadcast.note && (
+                    <p className="text-xs text-muted mt-0.5">{match.broadcast.note}</p>
+                  )}
+                </div>
+                <span className="shrink-0 text-xs font-bold rounded-md border border-accent/50 text-accent px-2.5 py-1">
+                  Open
+                </span>
+              </div>
+            </a>
+          )}
+
           <AdSlot format="inline" slotId="match-inline" />
         </div>
 

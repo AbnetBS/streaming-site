@@ -37,6 +37,11 @@ function seedData(): DBData {
         awayTeam: "Riverside FC",
         kickoff: mins(-35),
         status: "live",
+        broadcast: {
+          label: "Also streaming free officially on FIFA+",
+          url: "https://www.plus.fifa.com",
+          note: "Official free stream — example affiliate/official slot",
+        },
         links: [
           {
             id: uid(),
@@ -158,7 +163,9 @@ export function createMatch(input: MatchInput): Match {
 
 export function updateMatch(
   id: string,
-  patch: Partial<Pick<Match, "competition" | "homeTeam" | "awayTeam" | "kickoff" | "status">>
+  patch: Partial<
+    Pick<Match, "competition" | "homeTeam" | "awayTeam" | "kickoff" | "status" | "broadcast">
+  >
 ): Match | undefined {
   const db = readDB();
   const match = db.matches.find((m) => m.id === id);
@@ -168,6 +175,7 @@ export function updateMatch(
   if (patch.awayTeam !== undefined) match.awayTeam = patch.awayTeam;
   if (patch.kickoff !== undefined) match.kickoff = new Date(patch.kickoff).toISOString();
   if (patch.status !== undefined) match.status = patch.status;
+  if (patch.broadcast !== undefined) match.broadcast = patch.broadcast;
   writeDB(db);
   return match;
 }
